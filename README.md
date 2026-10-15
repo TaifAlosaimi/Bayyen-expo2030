@@ -4,7 +4,7 @@
 application designed to make project progress, item status, task
 completion, and coordination between project stakeholders easier to
 track.
-Bayyen brings project management and live site monitoring together through Fazza, our on-site robot interface.
+Bayyen brings construction project coordination together with **Fazza**, our on-site robot interface. The repository includes the Bayyen web application and Fazza's hardware-related source code for review.
 
 The project is being developed for an **Expo 2030 Riyadh challenge**
 concept. It includes role-based workspaces for project managers,
@@ -43,6 +43,8 @@ up with the relevant team.
     communication.
 -   **Fazza entry point** from the Consultant dashboard to open the live
     site robot interface on the local network.
+-   **Fazza source code** included in the repository under `hardware/Fazza/`,
+    with separate folders for the ESP32-S3 robot and the Arduino UNO robot.
 
 ## User roles
 
@@ -83,28 +85,43 @@ actions can vary by role and item state.
 
 ## Repository structure
 
-``` text
-bayyin_project/
-├── manage.py
+```text
+Bayyen-expo2030/
 ├── bayyin_project/
-│   ├── settings.py
-│   ├── urls.py
-│   ├── asgi.py
-│   └── wsgi.py
-└── core/
-    ├── migrations/
-    ├── static/
-    │   └── core/
-    │       ├── css/
-    │       └── images/
-    ├── templates/
-    │   └── core/
-    ├── forms.py
-    ├── models.py
-    ├── urls.py
-    ├── views.py
-    └── tests.py
+│   ├── manage.py
+│   ├── bayyin_project/
+│   │   ├── settings.py
+│   │   ├── urls.py
+│   │   ├── asgi.py
+│   │   └── wsgi.py
+│   └── core/
+│       ├── migrations/
+│       ├── static/
+│       │   └── core/
+│       │       ├── css/
+│       │       └── images/
+│       ├── templates/
+│       │   └── core/
+│       ├── forms.py
+│       ├── models.py
+│       ├── urls.py
+│       ├── views.py
+│       └── tests.py
+├── hardware/
+│   └── Fazza/
+│       ├── ESP32S3_Web_Robot/
+│       │   ├── ESP32S3_Web_Robot.ino
+│       │   ├── camera_pins.h
+│       │   └── dashboard.h
+│       └── UNO_Robot/
+│           └── UNO_Robot.ino
+├── README.md
+└── .gitignore
 ```
+
+The structure above documents the intended organization of the repository.
+Keep the existing Django project files in place and store Fazza's source
+code separately under `hardware/Fazza/`.
 
 ## Run locally
 
@@ -186,17 +203,33 @@ items from another computer.
 
 ## Fazza --- Live Site Robot
 
-The Consultant dashboard includes a **Fazza --- Live Site Robot** button
-that opens:
+**Fazza** is Bayyen's on-site robot interface. The Consultant dashboard
+provides a **Fazza — Live Site Robot** button that opens the robot's
+interface at:
 
-``` text
+```text
 http://192.168.4.1/
 ```
 
-This is a local-network address for the Fazza robot interface, not a
-public website. It will only work when the device running the browser
-can reach the robot on the required network. The address may need to be
-configured for a different network or demonstration setup.
+This is a local-network address, not a public website. It works only when
+the device running the browser can reach Fazza on the required network.
+The interface may therefore be unavailable to reviewers who are not
+connected to the robot's network.
+
+### Fazza source code
+
+Fazza's source files are included in this repository for inspection:
+
+- `hardware/Fazza/ESP32S3_Web_Robot/`
+  - `ESP32S3_Web_Robot.ino` — ESP32-S3 Arduino sketch.
+  - `camera_pins.h` — camera pin configuration header.
+  - `dashboard.h` — dashboard-related header file.
+- `hardware/Fazza/UNO_Robot/`
+  - `UNO_Robot.ino` — Arduino UNO sketch.
+
+These files are provided as source code alongside the Bayyen web
+application. Their presence in GitHub does not, by itself, make the
+physical robot or its local-network interface publicly accessible.
 
 ## Data model
 
@@ -234,6 +267,8 @@ Before pushing the project to a public repository or deploying it:
 4.  Do not commit real user passwords, private data, local database
     contents, uploaded attachments, or private network credentials.
 5.  Review the repository contents before each push.
+6.  Check hardware source files for Wi-Fi passwords, tokens, private
+    network details, or other credentials before publishing them.
 
 A public GitHub repository makes committed files visible to anyone.
 Changing or deleting a secret in a later commit does not remove it from
