@@ -1,0 +1,36 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Bayyen{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'core/css/base.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+<header class="site-top">
+  {% if request.user.role == 'CONTRACTOR_ENGINEER' %}
+    <a class="brand" href="{% url 'core:contractor_dashboard' %}" aria-label="Bayyen dashboard"><img src="{% static 'core/images/bayyen-logo.jpg' %}" alt="Bayyen"></a>
+  {% elif request.user.role == 'CONSULTANT_ENGINEER' %}
+    <a class="brand" href="{% url 'core:consultant_dashboard' %}" aria-label="Bayyen dashboard"><img src="{% static 'core/images/bayyen-logo.jpg' %}" alt="Bayyen"></a>
+  {% elif request.user.role == 'PROJECT_MANAGER' %}
+    <a class="brand" href="{% url 'core:project_manager_dashboard' %}" aria-label="Bayyen dashboard"><img src="{% static 'core/images/bayyen-logo.jpg' %}" alt="Bayyen"></a>
+  {% else %}
+    <a class="brand" href="{% url 'core:home' %}" aria-label="Bayyen home"><img src="{% static 'core/images/bayyen-logo.jpg' %}" alt="Bayyen"></a>
+  {% endif %}
+  {% if request.user.is_authenticated %}
+  <div class="user-area">
+    <div class="avatar">{{ request.user.get_full_name|default:request.user.username|slice:":2"|upper }}</div>
+    <div class="user-copy"><strong>{{ request.user.get_full_name|default:request.user.username }}</strong><span>{{ request.user.get_role_display }}</span></div>
+    <span class="top-divider"></span>
+    <form method="post" action="{% url 'core:logout' %}">{% csrf_token %}<button class="signout" type="submit"><img src="{% static 'core/icons/SignOut.svg' %}" alt="">Sign out</button></form>
+  </div>
+  {% endif %}
+</header>
+{% block content %}{% endblock %}
+</body>
+</html>

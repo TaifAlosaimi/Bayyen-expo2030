@@ -1,0 +1,79 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Bayyen helps teams follow construction work, documentation, and handovers for Expo 2030.">
+    <title>Bayyen | From site to decision</title>
+    <link rel="stylesheet" href="{% static 'core/css/home.css' %}">
+</head>
+<body>
+    <main class="home-page">
+        <header class="site-header">
+            <a class="brand" href="{% url 'core:home' %}" aria-label="Bayyen home">
+                <img src="{% static 'core/images/bayyen-logo.jpg' %}" alt="Bayyen بيّن">
+            </a>
+        </header>
+
+        <section class="hero" aria-labelledby="hero-title">
+            <div class="hero-copy">
+                <p class="eyebrow"><span aria-hidden="true"></span>From site to decision</p>
+                <h1 id="hero-title">Every task.. clear<br>Every item.. <span>documented</span></h1>
+                <p class="hero-description">
+                    Follow Expo 2030 works from the first assignment to the final approval.
+                    The full picture in front of you, every detail in its place.
+                </p>
+                <a class="primary-button" href="{% url 'core:login' %}">Enter the platform</a>
+                <p class="trust-note">
+                    <span class="shield-icon" aria-hidden="true">✓</span>
+                    A shared space for the project manager, consaultant engineer, and contractor engineer
+                </p>
+            </div>
+
+            <div class="hero-visual">
+                <div class="image-frame" aria-hidden="true"></div>
+                <img class="hero-image" src="{% static 'core/images/hero-engineers.jpg' %}" alt="Engineers reviewing construction work on a tablet at a site">
+                <aside class="project-note">
+                    <span class="check-box" aria-hidden="true">✓</span>
+                    <div>
+                        <h2>Expo 2030</h2>
+                        <p>One project. A shared vision.</p>
+                        <p>From site details to clear follow-up.</p>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <section class="features" aria-label="Bayyen platform benefits">
+            <article class="feature">
+                <span class="feature-icon" aria-hidden="true">
+                    <img src="{% static 'core/icons/Task.svg' %}" alt="">
+                </span>
+                <h2>Know where the work stands</h2>
+                <p>Clear tasks, defined responsibilities, and updates that keep you close to the site.</p>
+            </article>
+            <article class="feature">
+                <span class="feature-icon" aria-hidden="true">
+                    <img src="{% static 'core/icons/Files.svg' %}" alt="">
+                </span>
+                <h2>Every item has a record</h2>
+                <p>Files, submission versions, and review decisions, linked to the task itself.</p>
+            </article>
+            <article class="feature">
+                <span class="feature-icon" aria-hidden="true">
+                    <img src="{% static 'core/icons/Notes.svg' %}" alt="">
+                </span>
+                <h2>Notes that find their way</h2>
+                <p>Organized communication through the engineer, with replies saved alongside the work details.</p>
+            </article>
+        </section>
+
+        <footer class="site-footer">
+            <p>Bayyen · Clarity at each step</p>
+            <p>An interactive concept for following Expo 2030 works</p>
+        </footer>
+    </main>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block title %}My Items | Bayyen{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/contractor_dashboard.css' %}">{% endblock %}
+{% block content %}
+<main class="dash contractor-dash">
+  {% if messages %}<div class="messages">{% for message in messages %}<p role="status" class="message {{ message.tags }}">{{ message }}</p>{% endfor %}</div>{% endif %}
+  <div class="page-heading"><div class="eyebrow"><span class="before"></span><span class="expo-2030">Expo 2030 — Riyadh</span></div><div class="heading-row"><div><h1>My Items</h1><p class="subtitle">Track your assigned items, deadlines, and review status.</p></div><div class="total-count"><strong>{{ total_items }}</strong><span>My items</span></div></div></div>
+  <section class="progress" aria-label="My progress">
+    <div class="progress-ring" style="--progress: {{ progress }}%"><strong>{{ progress }}%</strong></div>
+    <div class="progress-content"><div class="progress-label-row"><h2>My progress</h2><span>{{ completed_items }} of {{ total_items }} items completed</span></div><div class="bar"><div class="bar-fill" style="width: {{ progress }}%"></div></div></div>
+  </section>
+  <section class="items-panel" aria-labelledby="items-heading"><div class="panel-heading"><h2 id="items-heading">Items <span class="count-badge">{{ total_items }}</span></h2></div>
+    <div class="table-wrap"><table class="items-table"><thead><tr><th>Item</th><th>Status</th><th>Contractor Company</th><th>Zone</th><th>Deadline</th></tr></thead><tbody>
+    {% for item in items %}<tr><td><a class="item-detail-link" href="{% url 'core:contractor_item_detail' item.pk %}"><strong>{{ item.title }}</strong><span class="item-code">ITM-{{ item.pk|stringformat:'03d' }}</span></a></td><td>{% if item.status == 'NEEDS_REVISION' %}<span class="status status-revision"><i></i>{{ item.get_status_display }}</span>{% elif item.status == 'PENDING_REVIEW' %}<span class="status status-review"><i></i>{{ item.get_status_display }}</span>{% elif item.status == 'IN_PROGRESS' %}<span class="status status-progress"><i></i>{{ item.get_status_display }}</span>{% elif item.status == 'COMPLETED' %}<span class="status status-completed"><i></i>{{ item.get_status_display }}</span>{% else %}<span class="status status-not-started"><i></i>{{ item.get_status_display }}</span>{% endif %}</td><td>{{ item.contractor_company|default:request.user.company_name|default:'—' }}</td><td>{{ item.zone|default:'—' }}</td><td>{{ item.due_date|date:'d M Y'|default:'—' }}</td></tr>
+    {% empty %}<tr><td class="empty-state" colspan="5">No items have been assigned to your account yet.</td></tr>{% endfor %}
+    </tbody></table></div>
+  </section>
+</main>
+{% endblock %}

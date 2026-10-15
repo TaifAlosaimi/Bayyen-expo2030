@@ -1,0 +1,52 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block title %}{{ item.title }} | Bayyen{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/consultant_item_detail.css' %}">{% endblock %}
+{% block content %}
+<main class="detail-page contractor-item-detail">
+  {% if messages %}<div class="flash-messages">{% for message in messages %}<p class="flash {{ message.tags }}" role="status">{{ message }}</p>{% endfor %}</div>{% endif %}
+  <div class="detail-heading">
+    <div>
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="{% url 'core:contractor_dashboard' %}">← Dashboard</a><span>/</span><span>ITM-{{ item.pk|stringformat:'03d' }}</span></nav>
+      <div class="title-line"><h1>{{ item.title }}</h1><span class="item-code">ITM-{{ item.pk|stringformat:'03d' }}</span><span class="status-badge status-{{ item.status|lower }}">{{ item.get_status_display }}</span></div>
+    </div>
+    <div class="heading-actions">
+      {% if item.status == 'PENDING_REVIEW' %}<span class="button button-secondary is-disabled" aria-disabled="true">Submitted for Review</span>
+      {% elif item.status == 'COMPLETED' %}<span class="button button-secondary is-disabled" aria-disabled="true">Approved</span>
+      {% else %}<form method="post">{% csrf_token %}<input type="hidden" name="action" value="submit_item"><button class="button button-primary" type="submit" {% if not consultant or not tasks or completed_tasks != tasks|length or item.status == 'PENDING_REVIEW' or item.status == 'COMPLETED' %}disabled title="Complete all tasks and ensure a consultant is assigned before submitting"{% endif %}>Submit Item</button></form>{% endif %}
+    </div>
+  </div>
+
+  <div class="detail-layout">
+    <div class="detail-main">
+      <section class="content-card item-information" aria-labelledby="item-info-heading">
+        <div class="section-heading"><h2 id="item-info-heading">Item information</h2></div>
+        <div class="item-facts">
+          <div><span>Zone</span><strong>{{ item.zone|default:'—' }}</strong></div>
+          <div><span>Deadline</span><strong>{{ item.due_date|date:'d M Y'|default:'—' }}</strong></div>
+          <div><span>Consultant Engineer</span><strong>{% if consultant %}{{ consultant.get_full_name|default:consultant.username }}{% else %}—{% endif %}</strong></div>
+        </div>
+        <div class="description-block"><span>Description</span><p>{{ item.description|default:'No description provided.' }}</p></div>
+      </section>
+
+      <section class="content-card tasks-card" aria-labelledby="tasks-heading">
+        <div class="section-heading tasks-heading"><div class="tasks-title"><h2 id="tasks-heading">Tasks <span class="count-badge">{{ tasks|length }}</span></h2><span class="tasks-progress">{{ completed_tasks }} of {{ tasks|length }} completed</span></div></div>
+        <div class="task-table-wrap"><table class="task-table"><thead><tr><th>Task</th><th>Status</th></tr></thead><tbody>
+        {% for row in task_rows %}<tr><td><strong>{{ row.task.title }}</strong><span class="task-description">{{ row.task.description|default:row.task.area|default:'' }}</span></td><td>{% if item.status != 'PENDING_REVIEW' and item.status != 'COMPLETED' %}<form method="post" class="task-status-form">{% csrf_token %}<input type="hidden" name="action" value="update_task_status"><input type="hidden" name="task_id" value="{{ row.task.pk }}"><label class="visually-hidden" for="task-status-{{ row.task.pk }}">Status for {{ row.task.title }}</label><select id="task-status-{{ row.task.pk }}" name="status" class="task-status-select" onchange="this.form.submit()"><option value="PENDING" {% if row.task.status == 'PENDING' %}selected{% endif %}>Pending</option><option value="IN_PROGRESS" {% if row.task.status == 'IN_PROGRESS' %}selected{% endif %}>In Progress</option><option value="COMPLETED" {% if row.task.status == 'COMPLETED' %}selected{% endif %}>Completed</option></select></form>{% else %}<span class="task-status task-{{ row.task.status|lower }}"><i></i>{{ row.task.get_status_display }}</span>{% endif %}</td></tr>
+        {% empty %}<tr><td colspan="2" class="empty-tasks">No tasks have been added to this item yet.</td></tr>{% endfor %}
+        </tbody></table></div>
+      </section>
+    </div>
+
+    <aside class="comments-panel contractor-comments-panel" aria-labelledby="comments-heading">
+      <div class="comments-heading"><h2 id="comments-heading">Comments</h2></div>
+      {% if consultant %}<p class="conversation-with">With <strong>{{ consultant.get_full_name|default:consultant.username }}</strong> · Consultant Engineer</p>{% else %}<p class="conversation-with">No active Consultant Engineer is assigned to this item.</p>{% endif %}
+      <div class="comment-thread" aria-live="polite">
+        {% for comment in comments %}<article class="comment-message {% if comment.sender_id == request.user.id %}is-mine{% endif %}"><div class="comment-avatar">{{ comment.sender.get_full_name|default:comment.sender.username|slice:':2'|upper }}</div><div class="comment-body"><div class="comment-meta"><strong>{{ comment.sender.get_full_name|default:comment.sender.username }}</strong><span>{{ comment.sender.get_role_display }}</span><time datetime="{{ comment.created_at|date:'c' }}">{{ comment.created_at|date:'d M, H:i' }}</time></div>{% if comment.content %}<p>{{ comment.content|linebreaksbr }}</p>{% endif %}{% if comment.attachment %}<a class="attachment-link" href="{{ comment.attachment.url }}" target="_blank" rel="noopener">Open attachment</a>{% endif %}</div></article>
+        {% empty %}<p class="no-comments">No messages in this conversation yet.</p>{% endfor %}
+      </div>
+      {% if consultant %}<form method="post" enctype="multipart/form-data" class="comment-composer">{% csrf_token %}<input type="hidden" name="action" value="send_comment"><div class="composer-fields"><div class="message-field"><label class="visually-hidden" for="id_content">Message</label>{{ message_form.content }}{% if message_form.content.errors %}<div class="field-errors">{{ message_form.content.errors }}</div>{% endif %}</div><label class="attachment-button" for="id_attachment" title="Attach a file">＋</label>{{ message_form.attachment }}{% if message_form.attachment.errors %}<div class="field-errors">{{ message_form.attachment.errors }}</div>{% endif %}<button class="button button-primary" type="submit">Send</button></div></form>{% endif %}
+    </aside>
+  </div>
+</main>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block title %}Items | Bayyen{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/consultant_dashboard.css' %}">{% endblock %}
+{% block content %}
+<main class="dash">
+  {% if messages %}<div class="messages">{% for message in messages %}<p role="status" class="message {{ message.tags }}">{{ message }}</p>{% endfor %}</div>{% endif %}
+  <div class="div"><div class="eyebrow"><div class="before"></div><div class="expo-2030">Expo 2030 — Riyadh</div></div><div class="h1"><b class="items">Items</b><p class="subtitle">Track project items, deadlines, and review status.</p></div><div class="dashboard-actions">
+    <a class="fazza-link" href="http://192.168.4.1/" target="_blank" rel="noopener noreferrer" aria-label="Open Fazza Live Site Robot">
+      <img src="{% static 'core/images/fazza-avatar.jpg' %}" alt="" class="fazza-avatar">
+      <span class="fazza-copy"><strong>Fazza</strong><span>Live Site Robot</span></span>
+      <span class="fazza-chevron" aria-hidden="true">›</span>
+    </a>
+    <div class="total-count"><strong>{{ total_items }}</strong><span>Total items</span></div>
+  </div></div>
+  <section class="progress" aria-label="Project progress">
+    <div class="progress-ring" style="--progress: {{ progress }}%"><strong>{{ progress }}%</strong></div>
+    <div class="div3"><div class="div4"><div class="project-progress">Project progress</div><div class="of-8-items">{{ completed_items }} of {{ total_items }} items completed</div></div><div class="bar"><div class="span" style="width: {{ progress }}%"></div></div></div>
+  </section>
+  <section class="tbl" aria-labelledby="items-heading"><div class="tbl-h"><div class="h2tbl-h"><div class="project-progress" id="items-heading">Items</div></div><div class="badge"><div class="needs-revision">{{ total_items }}</div></div></div>
+    <div class="table-wrap"><div class="table"><div class="tr table-head"><div class="th"><div class="item">Item</div></div><div class="th2"><div class="item">Status</div></div><div class="th3"><div class="item">Contractor Company</div></div><div class="th4"><div class="item">Zone</div></div><div class="th5"><div class="item">Deadline</div></div></div>
+    {% for item in items %}<a class="item-row {% cycle 'tr2' 'tr4' %}" href="{% url 'core:consultant_item_detail' item.pk %}">
+      <div class="td"><div class="iname"><div class="ground-slab-pouring">{{ item.title }}</div></div><div class="inum"><div class="itm-011">ITM-{{ item.pk|stringformat:'03d' }}</div></div></div>
+      <div class="status-cell">{% if item.status == 'NEEDS_REVISION' %}<span class="s-rev"><i></i><span>{{ item.get_status_display }}</span></span>{% elif item.status == 'PENDING_REVIEW' %}<span class="s-pend"><i></i><span>{{ item.get_status_display }}</span></span>{% elif item.status == 'IN_PROGRESS' %}<span class="s-progress"><i></i><span>{{ item.get_status_display }}</span></span>{% elif item.status == 'COMPLETED' %}<span class="s-done"><i></i><span>{{ item.get_status_display }}</span></span>{% else %}<span class="s-not"><i></i><span>{{ item.get_status_display }}</span></span>{% endif %}</div>
+      <div class="td3"><div class="alofuq-contracting">{{ item.contractor_company|default:'—' }}</div></div><div class="td4"><div class="alofuq-contracting">{{ item.zone|default:'—' }}</div></div><div class="td5"><div class="alofuq-contracting">{{ item.due_date|date:'d M Y'|default:'—' }}</div></div>
+    </a>{% empty %}<div class="empty-state">No items available yet.</div>{% endfor %}</div></div>
+  </section>
+</main>
+{% endblock %}

@@ -1,0 +1,92 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in | Bayyen</title>
+    <link rel="stylesheet" href="{% static 'core/css/login.css' %}">
+</head>
+<body>
+    <main class="login-page">
+        <section class="login-panel" aria-labelledby="login-title">
+            <a class="brand" href="{% url 'core:home' %}" aria-label="Bayyen home">
+                <img src="{% static 'core/images/bayyen-logo.jpg' %}" alt="Bayyen">
+            </a>
+
+            <div class="login-content">
+                <div class="eyebrow"><span></span>Your project space</div>
+                <header class="intro">
+                    <h1 id="login-title">Welcome to Bayyen</h1>
+                    <p>Sign in and stay on top of each step.</p>
+                </header>
+
+                <form class="login-form" method="post" novalidate>
+                    {% csrf_token %}
+                    {% if form.non_field_errors %}
+                        <div class="form-errors" role="alert">{{ form.non_field_errors }}</div>
+                    {% endif %}
+
+                    <div class="form-field">
+                        <label for="{{ form.username.id_for_label }}">Email</label>
+                        <input
+                            type="email"
+                            name="{{ form.username.html_name }}"
+                            id="{{ form.username.id_for_label }}"
+                            value="{{ form.username.value|default_if_none:'' }}"
+                            placeholder="name@company.com"
+                            autocomplete="email"
+                            required
+                        >
+                        {% if form.username.errors %}<div class="field-error" role="alert">{{ form.username.errors }}</div>{% endif %}
+                    </div>
+
+                    <div class="form-field">
+                        <label for="{{ form.password.id_for_label }}">Password</label>
+                        <div class="password-wrap">
+                            <input
+                                type="password"
+                                name="{{ form.password.html_name }}"
+                                id="{{ form.password.id_for_label }}"
+                                placeholder="Enter your password"
+                                autocomplete="current-password"
+                                required
+                            >
+                            <button class="password-toggle" type="button" aria-label="Show password" aria-pressed="false">
+                                <svg class="eye-open" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+                            </button>
+                        </div>
+                        {% if form.password.errors %}<div class="field-error" role="alert">{{ form.password.errors }}</div>{% endif %}
+                    </div>
+
+                    <button class="submit-button" type="submit">Sign in</button>
+                </form>
+            </div>
+        </section>
+
+        <aside class="visual-panel" aria-label="Bayyen project overview">
+            <img class="visual-image" src="{% static 'core/images/hero-engineers.jpg' %}" alt="Construction engineers reviewing project details together">
+            <div class="visual-overlay"></div>
+            <div class="visual-copy">
+                <div class="visual-eyebrow"><span></span>Expo 2030</div>
+                <h2>Clearer decisions.<br>Work closer to completion.</h2>
+                <p>Items, tasks, and updates in one space.</p>
+            </div>
+        </aside>
+    </main>
+    <script>
+        (() => {
+            const toggle = document.querySelector('.password-toggle');
+            const password = document.getElementById('{{ form.password.id_for_label }}');
+            if (!toggle || !password) return;
+            toggle.addEventListener('click', () => {
+                const show = password.type === 'password';
+                password.type = show ? 'text' : 'password';
+                toggle.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+                toggle.setAttribute('aria-pressed', String(show));
+                toggle.classList.toggle('is-visible', show);
+            });
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+<svg id="Report--Streamline-Carbon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" height="16" width="16">
+  <desc>
+    Report Streamline Icon: https://streamlinehq.com
+  </desc>
+  <defs></defs>
+  <title>report--alt</title>
+  <path d="M5 9h4v1h-4Z" fill="#1f7a8c" stroke-width="0.5"></path>
+  <path d="M5 6.5h6v1H5Z" fill="#1f7a8c" stroke-width="0.5"></path>
+  <path d="M5 11.5h2.5v1h-2.5Z" fill="#1f7a8c" stroke-width="0.5"></path>
+  <path d="M12.5 2.5h-1.5V2a1 1 0 0 0 -1 -1h-4a1 1 0 0 0 -1 1v0.5H3.5a1 1 0 0 0 -1 1v10.5a1 1 0 0 0 1 1h9a1 1 0 0 0 1 -1V3.5a1 1 0 0 0 -1 -1ZM6 2h4v2h-4Zm6.5 12H3.5V3.5h1.5v1.5h6V3.5h1.5Z" fill="#1f7a8c" stroke-width="0.5"></path>
+  <path id="_Transparent_Rectangle_" d="M0 0h16v16H0Z" fill="none" stroke-width="0.5"></path>
+</svg>

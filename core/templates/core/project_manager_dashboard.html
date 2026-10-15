@@ -1,0 +1,30 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block title %}Items | Bayyen{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/project_manager.css' %}">{% endblock %}
+{% block content %}
+<main class="pm-page">
+  {% if messages %}<div class="pm-flashes">{% for message in messages %}<p class="pm-flash {{ message.tags }}" role="status">{{ message }}</p>{% endfor %}</div>{% endif %}
+  <div class="pm-eyebrow"><span></span>Expo 2030 — Riyadh</div>
+  <div class="pm-title-row"><div><h1>Items</h1><p>Track project items, deadlines, and review status.</p></div><div class="pm-total"><strong>{{ total_items }}</strong><span>Total items</span></div></div>
+  <section class="pm-progress" aria-label="Project progress">
+    <div class="pm-ring" style="--progress:{{ progress }}%"><strong>{{ progress }}%</strong></div>
+    <div class="pm-progress-main"><div class="pm-progress-label"><strong>Project progress</strong><span>{{ completed_items }} of {{ total_items }} items completed</span></div><div class="pm-track"><span style="width:{{ progress }}%"></span></div></div>
+  </section>
+  <section class="pm-table-card">
+    <div class="pm-card-heading"><h2>Items <span>{{ total_items }}</span></h2></div>
+    <div class="pm-table-wrap"><table class="pm-table">
+      <thead><tr><th>Item</th><th>Status</th><th>Contractor Company</th><th>Zone</th><th>Deadline</th></tr></thead>
+      <tbody>
+      {% for item in items %}
+        <tr>
+          <td><a class="pm-item-link" href="{% url 'core:project_manager_item_detail' item.pk %}"><strong>{{ item.title }}</strong><small>ITM-{{ item.pk|stringformat:"03d" }}</small></a></td>
+          <td><span class="pm-status pm-status-{{ item.status|lower }}"><i></i>{{ item.get_status_display }}</span></td>
+          <td>{{ item.contractor_company|default:"—" }}</td><td>{{ item.zone|default:"—" }}</td><td>{{ item.due_date|date:"d M Y"|default:"—" }}</td>
+        </tr>
+      {% empty %}<tr><td class="pm-empty" colspan="5">No items available yet.</td></tr>{% endfor %}
+      </tbody>
+    </table></div>
+  </section>
+</main>
+{% endblock %}

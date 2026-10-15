@@ -1,0 +1,47 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block title %}{{ item.title }} | Bayyen{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/project_manager.css' %}">{% endblock %}
+{% block content %}
+<main class="pm-detail-page">
+  {% if messages %}<div class="pm-flashes">{% for message in messages %}<p class="pm-flash {{ message.tags }}" role="status">{{ message }}</p>{% endfor %}</div>{% endif %}
+  <div class="pm-detail-heading">
+    <div><nav class="pm-breadcrumb"><a href="{% url 'core:project_manager_dashboard' %}">← Dashboard</a><span>/</span><span>ITM-{{ item.pk|stringformat:"03d" }}</span></nav>
+      <div class="pm-detail-title"><h1>{{ item.title }}</h1><span class="pm-code">ITM-{{ item.pk|stringformat:"03d" }}</span><span class="pm-status pm-status-{{ item.status|lower }}"><i></i>{{ item.get_status_display }}</span></div>
+    </div>
+  </div>
+  <div class="pm-detail-layout">
+    <section class="pm-info-card">
+      <h2>Item information</h2>
+      <div class="pm-facts">
+        <div><span>Zone</span><strong>{{ item.zone|default:"—" }}</strong></div>
+        <div><span>Deadline</span><strong>{{ item.due_date|date:"d M Y"|default:"—" }}</strong></div>
+        <div><span>Contractor Company</span><strong>{{ item.contractor_company|default:"—" }}</strong></div>
+        <div><span>Consultant Engineer</span><strong>{% if consultant %}{{ consultant.get_full_name|default:consultant.username }}{% else %}—{% endif %}</strong></div>
+      </div>
+      <div class="pm-description"><span>Description</span><p>{{ item.description|default:"No description provided." }}</p></div>
+    </section>
+    <aside class="pm-comments">
+      <div class="pm-comments-heading"><h2>Comments</h2>{% if consultant %}<p>With <strong>{{ consultant.get_full_name|default:consultant.username }}</strong> · Consultant Engineer</p>{% else %}<p>No consultant assigned to this item.</p>{% endif %}</div>
+      <div class="pm-comment-thread" aria-live="polite">
+        {% for comment in comments %}
+          <article class="pm-comment {% if comment.sender_id == request.user.id %}is-mine{% endif %}">
+            <div class="pm-avatar">{{ comment.sender.get_full_name|default:comment.sender.username|slice:":2"|upper }}</div>
+            <div class="pm-comment-content"><div class="pm-comment-meta"><strong>{{ comment.sender.get_full_name|default:comment.sender.username }}</strong><span>{{ comment.created_at|date:"d M, H:i" }}</span></div>
+              {% if comment.content %}<p>{{ comment.content|linebreaksbr }}</p>{% endif %}
+              {% if comment.attachment %}<a class="pm-attachment" href="{{ comment.attachment.url }}" target="_blank" rel="noopener">Open attachment</a>{% endif %}
+            </div>
+          </article>
+        {% empty %}<p class="pm-no-comments">No messages in this conversation yet.</p>{% endfor %}
+      </div>
+      {% if consultant %}
+      <form method="post" enctype="multipart/form-data" class="pm-composer">
+        {% csrf_token %}<input type="hidden" name="action" value="send_comment">
+        <div class="pm-composer-row">{{ message_form.content }}<label class="pm-attach" for="id_attachment" title="Attach a file">＋</label>{{ message_form.attachment }}<button type="submit">Send</button></div>
+        {% if message_form.errors %}<div class="pm-errors">{{ message_form.errors }}</div>{% endif %}
+      </form>
+      {% endif %}
+    </aside>
+  </div>
+</main>
+{% endblock %}

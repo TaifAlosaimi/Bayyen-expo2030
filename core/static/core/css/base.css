@@ -1,0 +1,15 @@
+* { box-sizing: border-box; }
+body { margin: 0; line-height: normal; color: #022b3a; font-family: "IBM Plex Sans", sans-serif; background: #fff; }
+.site-top { width: 100%; min-height: 72px; padding: 12px 40px; display: flex; align-items: center; justify-content: space-between; gap: 24px; border-bottom: 1px solid #e1e5f2; background: #fff; }
+.brand { display: inline-flex; align-items: center; flex: 0 0 auto; }
+.brand img { display: block; width: 160px; height: 58px; object-fit: contain; }
+.user-area { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.avatar { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: 0 0 auto; background: #c2def7; color: #022b3a; font-size: 12px; font-weight: 600; }
+.user-copy { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.user-copy strong { font-size: 14px; font-weight: 600; white-space: nowrap; }
+.user-copy span { font-size: 12px; color: #1f7a8c; white-space: nowrap; }
+.top-divider { height: 36px; width: 1px; background: #e1e5f2; margin: 0 8px; }
+.user-area form { margin: 0; }
+.signout { border: 0; background: transparent; color: #022b3a; font: inherit; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.signout img { width: 20px; height: 20px; object-fit: contain; }
+@media (max-width: 640px) { .site-top { padding: 10px 16px; gap: 12px; } .brand img { width: 126px; height: 48px; } .user-area { gap: 8px; } .user-copy strong { max-width: 110px; overflow: hidden; text-overflow: ellipsis; } .top-divider { margin: 0 2px; } .signout { font-size: 0; gap: 0; } .signout img { width: 22px; height: 22px; } }

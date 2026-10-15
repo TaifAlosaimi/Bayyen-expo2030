@@ -1,0 +1,89 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block title %}{{ item.title }} | Bayyen{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/consultant_item_detail.css' %}">{% endblock %}
+{% block content %}
+<main class="detail-page">
+    {% if messages %}<div class="flash-messages">{% for message in messages %}<p class="flash {{ message.tags }}" role="status">{{ message }}</p>{% endfor %}</div>{% endif %}
+    <div class="detail-heading">
+        <div>
+            <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="{% url 'core:consultant_dashboard' %}">← Dashboard</a><span>/</span><span>ITM-{{ item.pk|stringformat:'03d' }}</span></nav>
+            <div class="title-line"><h1>{{ item.title }}</h1><span class="item-code">ITM-{{ item.pk|stringformat:'03d' }}</span><span class="status-badge status-{{ item.status|lower }}">{{ item.get_status_display }}</span></div>
+        </div>
+        <div class="heading-actions"><a class="button button-secondary" href="{% url 'core:consultant_item_detail' item.pk %}">Cancel</a><button class="button button-primary" type="submit" form="edit-item-form">Save Changes</button></div>
+    </div>
+
+    <div class="detail-layout">
+        <div class="detail-main">
+            <section class="review-card" aria-labelledby="review-heading">
+                <div class="review-copy">
+                    <span class="review-avatar">{% if item.submitted_by %}{{ item.submitted_by.get_full_name|default:item.submitted_by.username|slice:":2"|upper }}{% else %}EX{% endif %}</span>
+                    <div class="review-content">
+                        <h2 id="review-heading">{% if item.submitted_by %}{{ item.submitted_by.get_full_name|default:item.submitted_by.username }} submitted this item{% else %}Submission review{% endif %}</h2>
+                        <p class="review-meta">{% if item.submitted_at %}{{ item.submitted_at|date:"d M, H:i" }} · {% endif %}{{ item.get_status_display }}</p>
+                        <p class="submission-note">{{ item.submission_note|default:"No submission note has been provided." }}</p>
+                    </div>
+                </div>
+                {% if item.status == 'PENDING_REVIEW' %}
+                <div class="review-actions">
+                    <details class="return-details"><summary class="button button-secondary">Return with comment</summary><form method="post" class="return-form">{% csrf_token %}<input type="hidden" name="action" value="review_return">{{ review_form.as_p }}<button class="button button-primary" type="submit">Return item</button></form></details>
+                    <form method="post">{% csrf_token %}<input type="hidden" name="action" value="review_approve"><button class="button button-primary" type="submit">Approve</button></form>
+                </div>
+                {% else %}
+                <p class="review-hint">{% if item.status == 'COMPLETED' %}This item has been approved.{% elif item.status == 'NEEDS_REVISION' %}This item needs revision before it can be reviewed again.{% else %}When all tasks are completed, this item will move to Pending Review automatically.{% endif %}</p>
+                {% endif %}
+            </section>
+
+            <section class="content-card item-information" aria-labelledby="item-info-heading">
+                <div class="section-heading"><h2 id="item-info-heading">Item information</h2><details class="edit-details"><summary class="button button-outline"><img src="{% static 'core/icons/Edit.svg' %}" alt=""> Edit</summary></details></div>
+                <div class="item-facts"><div><span>Zone</span><strong>{{ item.zone|default:"—" }}</strong></div><div><span>Deadline</span><strong>{{ item.due_date|date:"d M Y"|default:"—" }}</strong></div><div><span>Contractor Company</span><strong>{{ item.contractor_company|default:"—" }}</strong></div></div>
+                <div class="description-block"><span>Description</span><p>{{ item.description|default:"No description provided." }}</p></div>
+                <details class="edit-item-details"><summary class="visually-hidden">Edit item fields</summary>
+                    <form method="post" id="edit-item-form" class="form-grid">{% csrf_token %}<input type="hidden" name="action" value="edit_item">{{ item_form.as_p }}<button class="button button-primary" type="submit">Save Changes</button></form>
+                </details>
+            </section>
+
+            <section class="content-card tasks-card" aria-labelledby="tasks-heading">
+                <div class="section-heading tasks-heading"><div class="tasks-title"><h2 id="tasks-heading">Tasks <span class="count-badge">{{ tasks|length }}</span></h2><span class="tasks-progress">{{ completed_tasks|default:0 }} of {{ tasks|length }} completed</span></div>
+                    <details class="add-task-details"><summary class="button button-outline"><span class="plus">+</span> Add Task</summary><form method="post" class="task-form">{% csrf_token %}<input type="hidden" name="action" value="add_task">{{ task_form.as_p }}<button class="button button-primary" type="submit">Add Task</button></form></details>
+                </div>
+                <div class="task-table-wrap"><table class="task-table"><thead><tr><th>Task</th><th>Status</th><th aria-label="Actions"></th></tr></thead><tbody>
+                {% for row in task_rows %}<tr><td><strong>{{ row.task.title }}</strong><span class="task-description">{{ row.task.description|default:row.task.area }}</span></td><td><span class="task-status task-{{ row.task.status|lower }}"><i></i>{{ row.task.get_status_display }}</span></td><td class="task-action"><details class="edit-task-details" {% if editing_task_id == row.task.pk %}open{% endif %}><summary><img src="{% static 'core/icons/Edit.svg' %}" alt=""> Edit</summary><form method="post" class="task-form">{% csrf_token %}<input type="hidden" name="action" value="edit_task"><input type="hidden" name="task_id" value="{{ row.task.pk }}">{{ row.form.as_p }}<button class="button button-primary" type="submit">Save Task</button></form></details></td></tr>
+                {% empty %}<tr><td colspan="3" class="empty-tasks">No tasks have been added to this item yet.</td></tr>{% endfor %}
+                </tbody></table></div>
+            </section>
+        </div>
+
+        <aside class="comments-panel" aria-labelledby="comments-heading">
+            <div class="comments-heading"><h2 id="comments-heading">Comments</h2></div>
+            <div class="conversation-tabs" role="tablist" aria-label="Choose conversation">
+                <a role="tab" aria-selected="{% if selected_conversation == 'project_manager' %}true{% else %}false{% endif %}" class="conversation-tab {% if selected_conversation == 'project_manager' %}is-active{% endif %}" href="?conversation=project_manager">Project Manager</a>
+                <a role="tab" aria-selected="{% if selected_conversation == 'contractor_engineer' %}true{% else %}false{% endif %}" class="conversation-tab {% if selected_conversation == 'contractor_engineer' %}is-active{% endif %}" href="?conversation=contractor_engineer">Contractor Engineer</a>
+            </div>
+            {% if selected_conversation == 'contractor_engineer' %}
+                <p class="conversation-with">With <strong>{% if contractor_engineers %}{% for engineer in contractor_engineers %}{{ engineer.get_full_name|default:engineer.username }}{% if not forloop.last %}, {% endif %}{% endfor %}{% else %}assigned Contractor Engineer{% endif %}</strong> · Contractor Engineer</p>
+            {% elif project_manager %}<p class="conversation-with">With <strong>{{ project_manager.get_full_name|default:project_manager.username }}</strong> · Project Manager</p>{% endif %}
+            <div class="comment-thread" aria-live="polite">
+                {% for comment in comments %}<article class="comment-message {% if comment.sender_id == request.user.id %}is-mine{% endif %}"><div class="comment-avatar">{{ comment.sender.get_full_name|default:comment.sender.username|slice:":2"|upper }}</div><div class="comment-body"><div class="comment-meta"><strong>{{ comment.sender.get_full_name|default:comment.sender.username }}</strong><span>{{ comment.sender.get_role_display|default:comment.sender.role|title }}</span><time datetime="{{ comment.created_at|date:'c' }}">{{ comment.created_at|date:"d M, H:i" }}</time></div>{% if comment.content %}<p>{{ comment.content|linebreaksbr }}</p>{% endif %}{% if comment.attachment %}<a class="attachment-link" href="{{ comment.attachment.url }}" target="_blank" rel="noopener">Open attachment</a>{% endif %}</div></article>
+                {% empty %}<p class="no-comments">No messages in this conversation yet.</p>{% endfor %}
+            </div>
+            {% if selected_conversation == 'project_manager' and not project_manager %}<p class="conversation-empty">No active Project Manager account is available for comments.</p>
+            {% elif selected_conversation == 'contractor_engineer' and not contractor_engineers %}<p class="conversation-empty">No active Contractor Engineer is assigned to this item yet.</p>
+            {% else %}<form method="post" enctype="multipart/form-data" class="comment-composer">{% csrf_token %}<input type="hidden" name="action" value="send_comment"><input type="hidden" name="conversation" value="{{ selected_conversation }}"><div class="composer-fields"><div class="message-field"><label class="visually-hidden" for="id_content">Message</label>{{ message_form.content }}{% if message_form.content.errors %}<div class="field-errors">{{ message_form.content.errors }}</div>{% endif %}</div><label class="attachment-button" for="id_attachment" title="Attach a file">＋</label>{{ message_form.attachment }}{% if message_form.attachment.errors %}<div class="field-errors">{{ message_form.attachment.errors }}</div>{% endif %}<button class="button button-primary" type="submit">Send</button></div></form>{% endif %}
+        </aside>
+    </div>
+</main>
+<script>
+(function () {
+  const editSummary = document.querySelector('.item-information .section-heading .edit-details summary');
+  const editDetails = document.querySelector('.edit-item-details');
+  if (editSummary && editDetails) {
+    editSummary.addEventListener('click', function (event) {
+      event.preventDefault();
+      editDetails.open = !editDetails.open;
+      if (editDetails.open) editDetails.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+  }
+})();
+</script>
+{% endblock %}
