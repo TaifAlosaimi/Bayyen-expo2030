@@ -15,6 +15,9 @@ consultant engineers, and contractor engineers, plus a link to
 > configuration and security notes before deploying or sharing a
 > production instance.
 
+Team Contributions :
+Taif Alosaimi – Platform Development
+Nawaf Almatrafi – Fazza Robot Development
 ------------------------------------------------------------------------
 
 ## Overview
