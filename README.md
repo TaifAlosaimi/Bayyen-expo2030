@@ -16,7 +16,7 @@ consultant engineers, and contractor engineers, plus a link to
 > production instance.
 
 Team Contributions :
-Taif Alosaimi – Platform Development
+Taif Alosaimi – Platform Development,
 Nawaf Almatrafi – Fazza Robot Development
 
 ------------------------------------------------------------------------
